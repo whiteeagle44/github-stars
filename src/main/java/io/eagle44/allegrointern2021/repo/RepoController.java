@@ -13,6 +13,6 @@ public class RepoController {
 
     @GetMapping(value = "{username}", produces = "application/json")
     public Repository getRepos(@PathVariable String username, @RequestParam(defaultValue = "30") String per_page, @RequestParam(defaultValue = "1") String page) {
-        return repoService.getRepositories(username, Integer.parseInt(per_page), Integer.parseInt(page));
+        return repoService.getRepository(username, Integer.parseInt(per_page), Integer.parseInt(page));
     }
 }

@@ -15,7 +15,7 @@ public class RepoService {
         this.repoClient = repoClient;
     }
 
-    public Repository getRepositories(String username, int perPage, int page) {
+    public Repository getRepository(String username, int perPage, int page) {
         ResponseEntity<List<Repo>> response = repoClient.queryGithubApiForRepos(username, perPage, page);
         List<String> linkHeader = response.getHeaders().get(HttpHeaders.LINK);
         Pagination pagination = null;

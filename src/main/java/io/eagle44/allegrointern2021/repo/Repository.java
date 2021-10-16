@@ -3,23 +3,23 @@ package io.eagle44.allegrointern2021.repo;
 import java.util.List;
 
 public class Repository {
-    private List<Repo> repo;
+    private List<Repo> repos;
     private Pagination pagination;
 
     public Repository() {
     }
 
-    public Repository(List<Repo> repo, Pagination pagination) {
-        this.repo = repo;
+    public Repository(List<Repo> repos, Pagination pagination) {
+        this.repos = repos;
         this.pagination = pagination;
     }
 
-    public List<Repo> getRepo() {
-        return repo;
+    public List<Repo> getRepos() {
+        return repos;
     }
 
-    public void setRepo(List<Repo> repo) {
-        this.repo = repo;
+    public void setRepos(List<Repo> repos) {
+        this.repos = repos;
     }
 
     public Pagination getPagination() {

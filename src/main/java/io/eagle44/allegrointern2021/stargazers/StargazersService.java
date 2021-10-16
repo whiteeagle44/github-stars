@@ -19,8 +19,8 @@ public class StargazersService {
         Repository repository;
         do {
             i++;
-            repository = repoService.getRepositories(username, 100, i);
-            sum += repository.getRepo().stream().mapToLong(Repo::getStargazersCount).sum();
+            repository = repoService.getRepository(username, 100, i);
+            sum += repository.getRepos().stream().mapToLong(Repo::getStargazersCount).sum();
         } while(repository.getPagination() != null && repository.getPagination().getNextPage() != null);
         return new Stargazers(sum);
     }
