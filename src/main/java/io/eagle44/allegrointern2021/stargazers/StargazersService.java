@@ -2,8 +2,10 @@ package io.eagle44.allegrointern2021.stargazers;
 
 import io.eagle44.allegrointern2021.repo.Repo;
 import io.eagle44.allegrointern2021.repo.RepoService;
-import io.eagle44.allegrointern2021.repo.Repository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class StargazersService {
@@ -14,14 +16,11 @@ public class StargazersService {
     }
 
     public Stargazers getStargazers(String username) {
-        int i = 0;
+        List<Repo> repos = repoService.getAllRepos(username);
         long sum = 0;
-        Repository repository;
-        do {
-            i++;
-            repository = repoService.getRepository(username, 100, i);
-            sum += repository.getRepos().stream().mapToLong(Repo::getStargazersCount).sum();
-        } while(repository.getPagination() != null && repository.getPagination().getNextPage() != null);
+        if (!Objects.isNull(repos)) {
+            sum += repos.stream().mapToLong(Repo::getStargazersCount).sum();
+        }
         return new Stargazers(sum);
     }
 }

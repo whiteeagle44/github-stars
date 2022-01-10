@@ -7,6 +7,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 import java.net.URI;
@@ -23,7 +24,7 @@ public class RepoClient {
         this.builder = builder;
     }
 
-    public ResponseEntity<List<Repo>> queryGithubApiForRepos(String username, int perPage, int page) throws ResponseStatusException {
+    public Mono<ResponseEntity<List<Repo>>> queryGithubApiForRepos(String username, int perPage, int page) throws ResponseStatusException {
         return builder
                 .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken)
@@ -32,8 +33,7 @@ public class RepoClient {
                 .get()
                 .uri(buildRepoQueryUri(username, perPage, page))
                 .retrieve()
-                .toEntityList(Repo.class)
-                .block();
+                .toEntityList(Repo.class);
     }
 
     private URI buildRepoQueryUri(String username, int perPage, int page) {

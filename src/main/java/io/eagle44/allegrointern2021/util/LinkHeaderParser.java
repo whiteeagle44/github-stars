@@ -3,6 +3,7 @@ package io.eagle44.allegrointern2021.util;
 import io.eagle44.allegrointern2021.repo.Pagination;
 
 import java.util.List;
+import java.util.Objects;
 
 public class LinkHeaderParser {
     public static Pagination parse(List<String> linkHeader) {
@@ -26,5 +27,15 @@ public class LinkHeaderParser {
         }
 
         return new Pagination(prevPage, nextPage, firstPage, lastPage);
+    }
+
+    public static int parseNumberOfPages(List<String> linkHeader) {
+        Pagination pagination = LinkHeaderParser.parse(linkHeader);
+        String lastPage = pagination.getLastPage();
+        if (Objects.isNull(lastPage)) {
+            return 1;
+        } else {
+            return Integer.parseInt(lastPage.substring(lastPage.indexOf("&page=") + 6));
+        }
     }
 }
