@@ -8,6 +8,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
 import java.net.URI;
@@ -25,7 +26,7 @@ public class LanguagesClient {
         this.builder = builder;
     }
 
-    public ResponseEntity<Map<String, Long>> queryGithubApiForLanguages(String username, String languageUrl, int perPage, int page) throws ResponseStatusException {
+    public Mono<ResponseEntity<Map<String, Long>>> queryGithubApiForLanguages(String username, String languageUrl) throws ResponseStatusException {
         return builder
                 .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken)
@@ -34,8 +35,7 @@ public class LanguagesClient {
                 .get()
                 .uri(languageUrl)
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<Map<String, Long>>() {})
-                .block();
+                .toEntity(new ParameterizedTypeReference<Map<String, Long>>() {});
     }
 
     public ResponseEntity<List<LanguagesUrl>> queryGithubApiForLanguagesUrls(String username, int perPage, int page) throws ResponseStatusException {

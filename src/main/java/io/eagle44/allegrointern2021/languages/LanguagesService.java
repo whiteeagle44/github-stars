@@ -1,9 +1,11 @@
 package io.eagle44.allegrointern2021.languages;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -15,20 +17,44 @@ public class LanguagesService {
     }
 
     public Languages getLanguages(String username, int repos) {
-        Languages languages = new Languages();
         List<String> languagesUrls = getLanguagesUrls(username, repos);
-        for (String languagesUrl : languagesUrls) {
-            Map<String, Long> response = languagesClient.queryGithubApiForLanguages(username, languagesUrl, repos, 1).getBody();
-            if(!Objects.isNull(response)) {
-                languages.addLanguages(response);
-            }
-        }
+        Languages languages = new Languages();
+
+        Flux.range(0, languagesUrls.size())
+                        .flatMap(i -> languagesClient.queryGithubApiForLanguages(username, languagesUrls.get(i)))
+                                .doOnNext(languagesOfOneRepo -> {
+                                    if (!Objects.isNull(languagesOfOneRepo.getBody())) {
+                                        languages.addLanguages(languagesOfOneRepo.getBody());
+                                    }
+                                })
+                                        .blockLast();
         return languages;
     }
 
     public List<String> getLanguagesUrls(String username, int repos) {
-        ResponseEntity<List<LanguagesUrl>> response = languagesClient.queryGithubApiForLanguagesUrls(username, repos, 1);
-        List<String> languagesUrlList = response.getBody().stream().map(LanguagesUrl::getLanguagesUrl).collect(Collectors.toList());
-        return Objects.requireNonNullElse(languagesUrlList, Collections.emptyList());
+        int pages = (int) Math.ceil((double) repos / 100); // e.g. repos=120 -> pages=2; repos = 50 -> pages=1
+
+        List<String> languagesUrls = new ArrayList<>(repos);
+        List<LanguagesUrl> partialLanguagesUrls;
+
+        for (int currentPage = 1; currentPage <= pages; currentPage++) {
+            if (currentPage == pages ) {
+                // e.g. repos=260, query for 60 repos from 3rd page (not 100)
+                partialLanguagesUrls = languagesClient
+                        .queryGithubApiForLanguagesUrls(username, repos - 100 * (pages - 1), currentPage)
+                        .getBody();
+            } else {
+                partialLanguagesUrls = languagesClient
+                        .queryGithubApiForLanguagesUrls(username, 100, currentPage)
+                        .getBody();
+            }
+            if (!Objects.isNull(partialLanguagesUrls)) {
+                languagesUrls.addAll(partialLanguagesUrls
+                        .stream()
+                        .map(LanguagesUrl::getLanguagesUrl)
+                        .collect(Collectors.toList()));
+            }
+        }
+        return languagesUrls;
     }
 }

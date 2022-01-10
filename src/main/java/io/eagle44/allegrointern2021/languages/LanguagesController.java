@@ -13,7 +13,7 @@ public class LanguagesController {
     }
 
     @GetMapping(value = "{username}")
-    public Languages getLanguages(@PathVariable String username, @RequestParam(defaultValue = "3") String repos) {
+    public Languages getLanguages(@PathVariable String username, @RequestParam(defaultValue = "100") String repos) {
         return languagesService.getLanguages(username, Integer.parseInt(repos));
     }
 
